@@ -34,6 +34,16 @@ const server = http.createServer((req, res) => {
 
     req.on('end', () => {
         buffer += decoder.end();
+
+        const requestRouteHandler = typeof(router[trimmedPath]) !== 'undefined'? router[trimmedPath] : handlers.notFound;
+
+        const data = {
+            'trimmedPath' : trimmedPath,
+            'queryStringObject' : queryStringObject,
+            'method' : method,
+            'headers' : headers,
+            'payload' : buffer
+        }
         
         console.log(buffer);
     })
@@ -48,4 +58,23 @@ const server = http.createServer((req, res) => {
 
 server.listen(port, () => {
     console.log(`Server active on port ${port}`);
-})
+});
+
+
+
+
+
+const handlers = {};
+
+handlers.sample = (data, callback) => {
+    callback(200, {"message" : "This is the sample object"});
+};
+
+handlers.notFound = (data, callback) => {
+    callback (400)
+}
+
+
+
+
+const router = {};
