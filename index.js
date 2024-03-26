@@ -35,7 +35,7 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
         buffer += decoder.end();
 
-        const requestRouteHandler = typeof(router[trimmedPath]) !== 'undefined'? router[trimmedPath] : handlers.notFound;
+        let requestRouteHandler = typeof(router[trimmedPath]) !== 'undefined'? router[trimmedPath] : handlers.notFound;
 
         const data = {
             'trimmedPath' : trimmedPath,
@@ -44,6 +44,18 @@ const server = http.createServer((req, res) => {
             'headers' : headers,
             'payload' : buffer
         }
+
+        requestRouteHandler = (data, (statusCode, payload) => {
+            statusCode = typeof(statusCode) === 'number' ? statusCode : 200;
+            payload = typeof(payload) === 'object' ? payload : {};
+
+            const payloadString = JSON.stringify(payload);
+            // res.setHeader("Content-Type", "application/json");
+            // res.write(statusCode);
+            // res.end(payloadString);
+
+            console.log(statusCode, payloadString);
+        })
         
         console.log(buffer);
     })
@@ -77,4 +89,6 @@ handlers.notFound = (data, callback) => {
 
 
 
-const router = {};
+const router = {
+    'sample': handlers.sample,
+};
